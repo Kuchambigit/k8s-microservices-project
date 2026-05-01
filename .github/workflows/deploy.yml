@@ -1,0 +1,30 @@
+name: Kubernetes CI Validation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Get your repo code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Install kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      # Step 3: Validate your Kubernetes YAML files
+      - name: Validate Kubernetes manifests
+        run: |
+          kubectl apply --dry-run=client -f k8s/
+          kubectl apply --dry-run=client -f ingress.yaml
+
+
