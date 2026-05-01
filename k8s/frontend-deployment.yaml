@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+          # Mount your ConfigMap files into the container
+          volumeMounts:
+            # Mount nginx.conf as the active nginx config
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: nginx.conf
+
+            # Mount index.html into nginx web root
+            - name: nginx-config
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+
+      # Define the ConfigMap as a volume
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
